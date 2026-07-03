@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pixelforge"
+version = "0.0.1"
+description = "AI ile pixel art asset üretimi: pipeline + eval + (LoRA) training"
+requires-python = ">=3.10"
+readme = "README.md"
+
+# ---- Çekirdek: hafif, GPU'suz. postprocess + eval bunlarla çalışır ----
+# Floor (>=) kullanıyoruz: çekirdek her Python sürümünde (yerel 3.14, Colab 3.12)
+# derlensin. Sert pin'ler asıl kırılgan olan [ml] stack'inde (aşağıda).
+dependencies = [
+    "pillow>=10.4",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+    "pydantic>=2.9",
+]
+
+[project.optional-dependencies]
+# ---- Ağır ML yığını: Colab / GPU makinede kurulur ----
+# Sürümler bilerek pinli. torchao/peft cehennemini (bkz. notebooks/demo.py geçmişi)
+# tekrar yaşamamak için tüm zinciri kilitliyoruz.
+ml = [
+    "torch==2.4.0",
+    "diffusers==0.31.0",
+    "transformers==4.44.2",
+    "accelerate==0.34.2",
+    "peft==0.17.0",
+    "torchao==0.16.0",
+    "safetensors==0.4.5",
+]
+# ---- Geliştirme ----
+dev = [
+    "pytest==8.3.3",
+    "ruff==0.6.9",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]

@@ -1,0 +1,17 @@
+# Varsayılan üretim ayarları. GenerationRequest alanlarıyla birebir eşleşir.
+# Kullanım: dict olarak yükle → GenerationRequest(**cfg).
+# Bu dosya versiyonlanır (reproducibility); ağırlıklar/çıktılar versiyonlanmaz.
+
+# --- Hız modu (LCM): hızlı iterasyon, prompt sadakati düşük ---
+steps: 8
+guidance_scale: 1.5
+
+# --- Kalite modu için (LCM'siz üretimde şu değerleri kullan) ---
+# steps: 30
+# guidance_scale: 7.5
+
+# --- Post-processing (gerçek pixel art burada oluşur) ---
+target_res: 128      # native çözünürlük; küçük = daha 'chunky'
+num_colors: 32       # palet büyüklüğü (16-64 tipik)
+
+negative_prompt: "3d render, realistic, photo, blurry, anti-aliased, smooth gradient, soft shading"
