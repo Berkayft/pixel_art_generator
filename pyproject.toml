@@ -32,6 +32,10 @@ ml = [
     "torchao==0.16.0",
     "safetensors==0.4.5",
 ]
+# ---- Dataset: HF Hub'a versiyonlama (hafif) ----
+data = [
+    "huggingface-hub>=0.24",
+]
 # ---- Geliştirme ----
 dev = [
     "pytest==8.3.3",

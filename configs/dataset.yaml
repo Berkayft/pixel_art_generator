@@ -1,0 +1,22 @@
+# LoRA #1 dataset manifesti. DatasetManifest ile birebir eşleşir.
+# Görseller git'e girmez (HF Hub); bu manifest versiyonlanır (reproducibility).
+# records: data/ pipeline'ı Kenney pack'ini işleyince doldurulur.
+
+name: kenney-lora-v1
+trigger: pxforge            # benzersiz token — caption'da stili absorbe eder (ADR-7)
+source: "Kenney: <pack adı> (CC0)"   # indirince doldur
+license: CC0
+
+# ADR-5 stil taksonomisi — dataset'in stilini tanımlar, CAPTION'a girmez (metadata).
+# Kenney pack'ine göre doldur:
+style_axes:
+  outline: none            # none | black | colored
+  resolution: "16px"       # 8px | 16px | 32px | ...
+  dithering: "no"          # no | yes
+  projection: top-down     # top-down | side | isometric
+  detail: minimalist       # minimalist | detailed
+
+native_res: 16             # kaynak pixel çözünürlüğü (Kenney tile'ları genelde 16)
+train_res: 512             # int-kat upscale hedefi (ADR-11: 512/16 = 32, tam sayı ✓)
+
+records: []                # data/ pipeline dolduracak
