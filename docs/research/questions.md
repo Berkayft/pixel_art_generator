@@ -41,8 +41,16 @@ Taslak — birlikte kesinleştirilecek.
 - **RQ-P1** — Görüntü → pixel art dönüşümü (pixelization) SOTA ne?
   Öğrenilmiş (GAN/diffusion) vs klasik yaklaşımlar.
 - **RQ-P2** — Palet çıkarımı/quantization (median-cut vs k-means vs öğrenilmiş) +
-  **dithering** teknikleri? Bizim `pixelate` neyi kaçırıyor?
+  **dithering** teknikleri (Floyd-Steinberg, ordered/Bayer)? Bizim `pixelate` neyi kaçırıyor?
 - **RQ-P3** — Pixel-art-aware downscaling (nearest/lanczos ötesi) yaklaşımları?
+
+## Pre-process
+
+- **RQ-P4** — **Dataset hazırlığı (training):** pixel-art veriyi eğitime nasıl hazırlamalı?
+  grid-hizalı resize, palet normalizasyonu, arka plan/transparency, dedup, boyut bucketing.
+  **Augmentation pixel-art'ta güvenli mi?** (rotation/scale grid'i bozar → dikkat) → ADR-8, RQ-L2.
+- **RQ-P5** — **Girdi/conditioning ön-işleme (inference):** prompt şablonu, img2img/ControlNet
+  için girdi hazırlığı (siluet/poz), taksonomi tag'lerinin prompt'a enjeksiyonu → ADR-7.
 
 ## Kesinleştirme notları
 - _(RQ eklendi/çıkarıldı ise buraya tarih + neden)_

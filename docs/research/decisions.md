@@ -95,6 +95,34 @@ bulguya dayanıyor. Bu dosya taramanın "çıktısı" — geri kalan her şey bu
 - **Dayanak:** SDXL LoRA best-practice guide'ları.
 - **Sonuç:** Küçük ama temiz veri → hızlı iterasyon; kapsam Faz 2'de büyür.
 
+### ADR-9: pixelate'e opsiyonel dithering — statik FS, animasyon ordered
+- **Durum:** öneri
+- **Bağlam:** `pixelate` quantize ediyor ama dithering yok. Dithering aileleri farklı
+  bağlama uyar: error-diffusion sadık ama animasyonda titrer; ordered/Bayer kararlı tile'lanır.
+- **Karar:** `pixelate`'e **opsiyonel `dither` parametresi** ekle. Faz 1 (statik):
+  Floyd-Steinberg/Atkinson. Faz 4 (animasyon): ordered/Bayer (temporal kararlılık). Sıra:
+  quantize → dither. Varsayılan kapalı; eval ile aç/kapa kıyasla.
+- **Dayanak:** dithering rehberleri + quantize+dither best-practice ([[synthesis/postprocess]]).
+- **Sonuç:** Tek kod yolu iki fazı da destekler; statik→animasyon köprüsü postprocess'te kurulur.
+
+### ADR-10: İçerik-duyarlı downscale'i dene, LANCZOS baseline kalsın
+- **Durum:** öneri
+- **Bağlam:** LANCZOS makul ama içerik-duyarlı downscale kenar/şekil/transparency'yi 2-4×'te
+  daha iyi koruyor.
+- **Karar:** Baseline LANCZOS kalsın; içerik-duyarlı varyantı **opsiyon** olarak ekle, eval
+  harness ile **A/B** kıyasla (grid_alignment + edge_sharpness metrikleriyle ölç). Kazanırsa varsayılan yap.
+- **Dayanak:** Adaptive Downscaling of Pixel Art ([[sources.log]] #23).
+- **Sonuç:** Deneysel iyileştirme; karar veriyle (metriklerle) verilir, tahminle değil.
+
+### ADR-11: Augmentation politikası — rotation/scale YASAK
+- **Durum:** kabul
+- **Bağlam:** Rotation ve keyfi scaling pixel-art grid'ini bozar (interpolasyon → bulanık,
+  hizasız). Veri hacmi için cazip ama stil-saflığına zarar.
+- **Karar:** Dataset augmentation'da **rotation ve keyfi-scale YASAK**. İzinli: yatay flip,
+  palet kaydırma, tam-sayı-kat scale, arka plan kompozisyonu (fg/bg ayrımı için, Faz 2).
+- **Dayanak:** sprite/pixel-art augmentation pitfall bulguları ([[synthesis/postprocess]]).
+- **Sonuç:** Grid bütünlüğü korunur; ADR-8 (dataset) ile birlikte temiz eğitim verisi.
+
 ---
 
 ## Kapsam dışı

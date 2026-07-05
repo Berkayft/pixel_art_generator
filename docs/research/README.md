@@ -23,7 +23,7 @@ topic bitince `synthesis/`'te topla → karara değeni `decisions.md`'ye geçir.
 |-------|----|-------|--------|--------|-------|
 | LoRA / fine-tune | RQ-L1..L4 | 5-8 | 1 (skim)+guide'lar | 🟢 | 🟢 (ADR-6..8) |
 | Evaluation | RQ-E1..E6 | 5-8 | 6 (skim) | 🟢 | 🟢 (ADR-1..5) |
-| Post-process | RQ-P1..P3, X1 | 5-8 | 1 (skim) | ⬜ | ⬜ |
+| Pre/Post-process | RQ-P1..P5, X1 | 5-8 | 2+guide'lar | 🟢 | 🟢 (ADR-9..11) |
 
 ## Tarama günlüğü
 
@@ -44,6 +44,11 @@ Her oturum sonunda 2 satır: ne bakıldı, ne çıktı.
   **ikinci derece** ("optimal ayarla fark küçük") → baseline düz LoRA, fallback LoKr/DoRA;
   (3) **caption altın kuralı**: stili yazma, gerisini tag'le → ADR-5 taksonomisiyle birleşti.
   ADR-6..8 yazıldı. LoRA tarafı karara hazır.
+- **Tur 4 (pre/post-process):** 3 sorgu + RQ-P4/P5 eklendi. Bulgular: (1) dithering iki aile →
+  **statik=FS, animasyon=ordered/Bayer** (statik→animasyon köprüsü!); (2) içerik-duyarlı
+  downscale > lanczos (A/B ile dene); (3) **rotation/scale augmentation grid'i bozar → yasak**;
+  (4) GameTileNet = Faz 1 dataset adayı. ADR-9..11 yazıldı. Post/pre karara hazır.
+  **→ Literatür taraması tamamlandı; 3 topic de 🟢. Sıradaki: Faz 1 uygulaması.**
 
 ## Guardrail
 - Topic başına hedefi aşma; "ilginç ama alakasız" → `decisions.md` "Kapsam dışı".

@@ -27,3 +27,10 @@ Durum: `INCLUDE` (→ papers/'a not) · `SKIM` (künye + 1 cümle) · `EXCLUDE` 
 | 18 | Block-wise LoRA ([2403.07500](https://arxiv.org/pdf/2403.07500)) | lora | SKIM | stilizasyon için blok-bazlı LoRA → RQ-L4 (nerede öğreniyor) |
 | 19 | SDXL LoRA + captioning guide'ları (Multic/viewcomfy/RunDiffusion) | lora | SKIM | dataset boyutu + tag caption + trigger → RQ-L2 |
 | 20 | Personalization karşılaştırması (andyhtu / bosonbrain) | lora | SKIM | LoRA vs DreamBooth vs TI trade-off → RQ-L1 |
+| 21 | Dithering rehberleri (ASCII Magic / Wikipedia FS / Cloudinary) | postprocess | SKIM | error-diffusion vs ordered/Bayer → RQ-P2 (animasyon bağı!) |
+| 22 | Joint Color Quantization & Dithering ([CAE'15](https://www.caeaccess.org/research/volume3/number7/hassan-2015-cae-651992.pdf)) | postprocess | SKIM | quantize+dither birlikte optimize → RQ-P2 |
+| 23 | Adaptive Downscaling of Pixel Art ([hiivelabs](https://hiivelabs.com/blog/gamedev/graphics/2025/01/19/adaptive-downscaling-pixel-art/)) | postprocess | INCLUDE | içerik-duyarlı downscale > lanczos → RQ-P3 |
+| 24 | Pixel-art scaling algorithms ([Wikipedia](https://en.wikipedia.org/wiki/Pixel-art_scaling_algorithms)) | postprocess | SKIM | hqx/xBR (upscale) — bizim preview'a değil, referans |
+| 25 | Retro Diffusion at scale ([Runware](https://runware.ai/blog/retro-diffusion-creating-authentic-pixel-art-with-ai-at-scale)) | postprocess | SKIM | "model + post-process" mimarimizi doğruluyor |
+| 26 | Sprite Imputation GAN ([2409.10721](https://arxiv.org/html/2409.10721v1)) | lora/data | SKIM | 14k 4-yön karakter; rotation zararlı bulgusu → RQ-P4, Faz 4 |
+| 27 | GameTileNet ([2507.02941](https://arxiv.org/html/2507.02941v1)) | data | INCLUDE | düşük-çöz. oyun sanatı semantik dataset → Faz 1 dataset adayı |
