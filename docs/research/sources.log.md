@@ -22,3 +22,8 @@ Durum: `INCLUDE` (→ papers/'a not) · `SKIM` (künye + 1 cümle) · `EXCLUDE` 
 | 13 | Pixel Art (Wikipedia) | eval | SKIM | taksonomi: isometric/non-iso, çözünürlük katmanları |
 | 14 | 2D Pixel Art Style Guide, Sprite-AI | eval | SKIM | stil eksenleri: 8-bit→HD, palet/AA/dithering katmanları |
 | 15 | Dithering Guide (Pixnote / drububu) | postprocess | SKIM | dithering desenleri → RQ-P2 (quantization+dither) |
+| 16 | Navigating T2I Customization: LyCORIS→Eval ([2309.14859](https://arxiv.org/html/2309.14859v2)) | lora | INCLUDE | LyCORIS yöntemleri + eval köprüsü → RQ-L1/L3 |
+| 17 | LyCORIS repo ([KohakuBlueleaf](https://github.com/KohakuBlueleaf/LyCORIS)) | lora | SKIM | LoCon/LoHa/LoKr/DoRA implementasyonu → RQ-L3 |
+| 18 | Block-wise LoRA ([2403.07500](https://arxiv.org/pdf/2403.07500)) | lora | SKIM | stilizasyon için blok-bazlı LoRA → RQ-L4 (nerede öğreniyor) |
+| 19 | SDXL LoRA + captioning guide'ları (Multic/viewcomfy/RunDiffusion) | lora | SKIM | dataset boyutu + tag caption + trigger → RQ-L2 |
+| 20 | Personalization karşılaştırması (andyhtu / bosonbrain) | lora | SKIM | LoRA vs DreamBooth vs TI trade-off → RQ-L1 |

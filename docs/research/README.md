@@ -21,7 +21,7 @@ topic bitince `synthesis/`'te topla → karara değeni `decisions.md`'ye geçir.
 
 | Topic | RQ | Hedef | Okundu | Sentez | Karar |
 |-------|----|-------|--------|--------|-------|
-| LoRA / fine-tune | RQ-L1..L4 | 5-8 | 0 | ⬜ | ⬜ |
+| LoRA / fine-tune | RQ-L1..L4 | 5-8 | 1 (skim)+guide'lar | 🟢 | 🟢 (ADR-6..8) |
 | Evaluation | RQ-E1..E6 | 5-8 | 6 (skim) | 🟢 | 🟢 (ADR-1..5) |
 | Post-process | RQ-P1..P3, X1 | 5-8 | 1 (skim) | ⬜ | ⬜ |
 
@@ -39,6 +39,11 @@ Her oturum sonunda 2 satır: ne bakıldı, ne çıktı.
   Pixel-VQ-VAE açık repo (fusion-dance), stil taksonomisi eksenleri. **Ana çıktı:**
   *pixel-art-aware CMMD* fikri (Pixel-VQ-VAE embedding + MMD) = stil-koşullu eval aracı.
   Eval sentezi 5 karar adayıyla dolduruldu. Eval tarafı karara hazır → sıradaki: RQ-L1.
+- **Tur 3 (RQ-L1 / LoRA):** 3 sorgu → LoRA vs DreamBooth vs TI, LyCORIS ailesi, dataset+caption.
+  Bulgular: (1) stil+Colab için **LoRA net kazanan** (DreamBooth 2-7GB ağır); (2) adapter tipi
+  **ikinci derece** ("optimal ayarla fark küçük") → baseline düz LoRA, fallback LoKr/DoRA;
+  (3) **caption altın kuralı**: stili yazma, gerisini tag'le → ADR-5 taksonomisiyle birleşti.
+  ADR-6..8 yazıldı. LoRA tarafı karara hazır.
 
 ## Guardrail
 - Topic başına hedefi aşma; "ilginç ama alakasız" → `decisions.md` "Kapsam dışı".

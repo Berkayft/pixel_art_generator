@@ -66,6 +66,35 @@ bulguya dayanıyor. Bu dosya taramanın "çıktısı" — geri kalan her şey bu
 - **Dayanak:** style guide'lar + stil-koşullu eval ihtiyacı.
 - **Sonuç:** Eval ↔ training tek taksonomi üzerinden hizalanır; RQ-L1/L2'yi doğrudan besler.
 
+### ADR-6: Baseline düz LoRA + önce SD1.5; fallback LoKr/DoRA
+- **Durum:** öneri
+- **Bağlam:** PEFT'te onlarca yöntem var ama stil + Colab kısıtında seçenek daralıyor.
+  DreamBooth 2-7 GB (ağır), TI kapasitesi düşük. Adapter tipi ikinci derece: "optimal
+  ayarla kalite farkı küçük" ([[papers/2023-lycoris-eval]]).
+- **Karar:** Baseline **düz LoRA (LoCon)**, iterasyon için **önce SD1.5** (T4'te hızlı),
+  sağlamlaşınca SDXL. Fallback zinciri: yeterince öğrenmiyorsa → **LoKr** (düşük factor,
+  full dim); kalite platoda → **DoRA** (daha pahalı). LyCORIS repo hepsini tek arayüzde verir.
+- **Dayanak:** LyCORIS-eval + personalization karşılaştırmaları + Colab kısıtı.
+- **Sonuç:** En az sürtünmeyle çalışan baseline; adapter tipini erken over-optimize etmeyiz.
+
+### ADR-7: Caption şeması — trigger + tag, stili yazma, taksonomiyi tag'le
+- **Durum:** öneri
+- **Bağlam:** Stil LoRA'sında caption stratejisi kaliteyi birinci derecede belirler.
+- **Karar:** SDXL için **virgülle ayrılmış tag** (doğal dil değil): `<trigger>, içerik_tag'leri`.
+  **Altın kural:** öğretilecek stili caption'lama (trigger absorbe etsin), geri kalan her şeyi
+  (içerik, kompozisyon) yaz. Stil taksonomisi eksenlerini (outline/dithering/çözünürlük →
+  [[decisions]] ADR-5) *tag* olarak kullan → koşullu üretim + eval ile hizalı. Oto-annotate + elle düzelt.
+- **Dayanak:** SDXL LoRA guide'ları (sources.log #19) + ADR-5.
+- **Sonuç:** Trigger stile net bağlanır; taksonomi tag'leri stil-koşullu üretimi mümkün kılar.
+
+### ADR-8: Dataset ~30-100 tutarlı görsel, kalite > nicelik
+- **Durum:** öneri
+- **Bağlam:** "25 iyi > 75 tutarsız"; stil için tutarlılık kritik; Colab kısıtı büyük veriyi zorlar.
+- **Karar:** İlk LoRA için **~30-100 tutarlı stilde** CC0 görsel (Kenney vb.). Oto-annotate +
+  elle düzelt. Dataset HF Hub'da versiyonlanır (git'e girmez).
+- **Dayanak:** SDXL LoRA best-practice guide'ları.
+- **Sonuç:** Küçük ama temiz veri → hızlı iterasyon; kapsam Faz 2'de büyür.
+
 ---
 
 ## Kapsam dışı
