@@ -7,9 +7,11 @@ from PIL import Image
 from pixelforge.data import (
     DatasetManifest,
     ImageRecord,
+    build_dataset,
     dedup,
     hflip,
     normalize,
+    prepare_tile,
     validate_pixel_asset,
 )
 
@@ -78,3 +80,51 @@ def test_normalize_non_integer_reddeder():
 def test_hflip_boyut_korur():
     img = _blocky()
     assert hflip(img).size == img.size
+
+
+# ---- prepare_tile (değişken boyut + pad, ADR-11) ----
+
+def test_prepare_tile_16px_tam_kat():
+    out = prepare_tile(_blocky(block=4, blocks=4), target_res=512)   # 16px
+    assert out.size == (512, 512) and out.mode == "RGBA"
+
+
+def test_prepare_tile_18px_pad_ile():
+    # 18px kaynak → 28×=504 → 512'ye pad. Interpolasyon yok → renk üremez.
+    img = Image.fromarray(np.zeros((18, 18, 3), dtype=np.uint8), "RGB")
+    img.putpixel((0, 0), (255, 0, 0))
+    out = prepare_tile(img, target_res=512)
+    assert out.size == (512, 512)
+
+
+def test_prepare_tile_target_ustu_reddeder():
+    big = Image.new("RGB", (600, 600))
+    with pytest.raises(ValueError):
+        prepare_tile(big, target_res=512)
+
+
+# ---- build_dataset (uçtan uca) ----
+
+def test_build_dataset_uctan_uca(tmp_path):
+    # sentetik "pack": kök tile'lar + characters/ alt-klasörü
+    src = tmp_path / "Tiles"
+    (src / "characters").mkdir(parents=True)
+    _blocky(colors=4).save(src / "tile_0000.png")
+    _blocky(colors=6).save(src / "tile_0001.png")
+    _blocky(colors=4).save(src / "tile_0002.png")           # tile_0000 ile aynı → dedup
+    _blocky(colors=8).save(src / "characters" / "tile_0000.png")
+
+    out = tmp_path / "processed"
+    manifest, stats = build_dataset([src], out, trigger="pxforge", name="t")
+
+    assert stats.found == 4 and stats.duplicates == 1        # bir tekrar elendi
+    assert stats.kept == len(manifest.records)
+    # kategori tag'i alt-klasörden gelir
+    cats = {tuple(r.content_tags) for r in manifest.records}
+    assert ("characters",) in cats and ("tile",) in cats
+    # caption ADR-7: trigger + kategori
+    rec = next(r for r in manifest.records if r.content_tags == ["characters"])
+    assert rec.caption("pxforge") == "pxforge, characters"
+    # manifest.json + görseller yazıldı
+    assert (out / "manifest.json").exists()
+    assert len(list((out / "images").glob("*.png"))) == stats.kept
