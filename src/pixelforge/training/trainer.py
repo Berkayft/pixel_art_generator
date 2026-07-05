@@ -158,12 +158,21 @@ def train_lora(cfg: TrainingConfig) -> str:
     print(f"LoRA kaydedildi → {out_dir}")
 
     if cfg.push_to_hub_repo:
-        from huggingface_hub import HfApi
+        # Push başarısızlığı BAŞARILI eğitim+kaydı geçersiz kılmasın (registry opsiyonel)
+        try:
+            from huggingface_hub import HfApi
 
-        api = HfApi()
-        api.create_repo(cfg.push_to_hub_repo, exist_ok=True)
-        api.upload_folder(folder_path=str(out_dir), repo_id=cfg.push_to_hub_repo)
-        print(f"Hub'a push → https://huggingface.co/{cfg.push_to_hub_repo}")
+            api = HfApi()
+            api.create_repo(cfg.push_to_hub_repo, repo_type="model", exist_ok=True)
+            api.upload_folder(
+                folder_path=str(out_dir), repo_id=cfg.push_to_hub_repo, repo_type="model"
+            )
+            print(f"Hub'a push → https://huggingface.co/{cfg.push_to_hub_repo}")
+        except Exception as e:
+            print(
+                f"[uyarı] Hub push başarısız ({e}). LoRA yerelde güvende: {out_dir}. "
+                "WRITE yetkili token ile login olup outputs'u elle push edebilirsin."
+            )
 
     if run:
         run.finish()
