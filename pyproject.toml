@@ -20,9 +20,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# ---- Ağır ML yığını: Colab / GPU makinede kurulur ----
-# Sürümler bilerek pinli. torchao/peft cehennemini (bkz. notebooks/demo.py geçmişi)
-# tekrar yaşamamak için tüm zinciri kilitliyoruz.
+# ---- Ağır ML yığısı: Colab / GPU makinede kurulur ----
+# Sürümler bilerek pinli. torchao BİLEREK YOK: düz LoRA quantization istemez; torchao
+# kurulu olunca peft onu zorla import ediyor ve torch dtype uyumsuzluğu ('torch.int1')
+# patlıyor (bkz. notebooks/demo.py + train geçmişi). Colab'da preinstalled torchao'yu
+# notebook uninstall ediyor.
 ml = [
     "torch==2.4.0",
     "torchvision==0.19.0",
@@ -30,7 +32,6 @@ ml = [
     "transformers==4.44.2",
     "accelerate==0.34.2",
     "peft==0.17.0",
-    "torchao==0.16.0",
     "safetensors==0.4.5",
     "wandb==0.18.5",
 ]

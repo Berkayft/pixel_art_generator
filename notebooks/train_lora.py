@@ -11,6 +11,8 @@
 #
 # Repo PUBLIC ise:
 # !pip install -q "pixelforge[ml,data] @ git+https://github.com/Berkayft/pixel_art_generator.git"
+# !pip uninstall -y torchao    # ÖNEMLİ: düz LoRA torchao istemez; kurulu kalırsa peft
+#                              # onu import edip 'torch.int1' hatası verir (torch 2.4 uyumsuz)
 #
 # Repo PRIVATE ise (Colab Secret'ta GH_TOKEN tanımla, sol menü 🔑):
 # from google.colab import userdata
