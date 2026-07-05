@@ -4,8 +4,9 @@
 *.pt
 *.pth
 *.bin
-data/
-datasets/
+# SADECE kök dataset dizini yok sayılır; src/pixelforge/data/ (kaynak kod) tracked kalır
+/data/
+/datasets/
 outputs/
 checkpoints/
 runs/
