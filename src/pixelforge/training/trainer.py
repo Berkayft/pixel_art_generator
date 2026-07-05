@@ -17,7 +17,7 @@ from pathlib import Path
 from pixelforge.eval.metrics import evaluate_asset
 from pixelforge.postprocess.pixelate import pixelate
 from pixelforge.training.config import TrainingConfig
-from pixelforge.training.dataset import load_examples
+from pixelforge.training.dataset import load_examples, load_hf_zip_captioned
 
 # SD1.5 UNet attention projeksiyonları — LoRA buralara takılır
 _LORA_TARGETS = ["to_q", "to_k", "to_v", "to_out.0"]
@@ -53,10 +53,18 @@ def train_lora(cfg: TrainingConfig) -> str:
         run = wandb.init(project=cfg.wandb_project, name=cfg.run_name, config=cfg.model_dump())
 
     # ---- veri (hafif çekirdek) → torch Dataset ----
-    examples = load_examples(
-        cfg.dataset, revision=cfg.dataset_revision,
-        background=cfg.background, resolution=cfg.resolution,
-    )
+    if cfg.caption_csv:   # captioned csv+zip dataset (LPC); caption trigger içermez
+        examples = load_hf_zip_captioned(
+            cfg.dataset, caption_csv=cfg.caption_csv, images_zip=cfg.images_zip,
+            revision=cfg.dataset_revision, subsample=cfg.subsample, seed=cfg.seed,
+            background=cfg.background, resolution=cfg.resolution,
+        )
+    else:                 # kendi manifest dataset'imiz (Kenney)
+        examples = load_examples(
+            cfg.dataset, revision=cfg.dataset_revision,
+            background=cfg.background, resolution=cfg.resolution,
+        )
+    print(f"dataset: {len(examples)} örnek yüklendi")
     tokenizer = CLIPTokenizer.from_pretrained(cfg.base_model, subfolder="tokenizer")
     img_tf = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]  # → [-1, 1]

@@ -16,9 +16,13 @@ class TrainingConfig(BaseModel):
     # ---- veri ----
     dataset: str = "BerkayFT/pixelforge-kenney-tiny-v1"   # HF id veya yerel dizin
     dataset_revision: str = "main"                        # reproducibility: versiyon sabitle
-    trigger: str = "pxforge"
+    trigger: str = "pxforge"                              # manifest yolunda caption öneki
     resolution: int = 512
     background: str = "white"                             # RGBA flatten arka planı
+    # ---- captioned HF dataset (csv+zip) yolu; set ise manifest yerine bu kullanılır ----
+    caption_csv: str | None = None                        # ör. "captions/captions_optimized.csv"
+    images_zip: str = "images/train.zip"
+    subsample: int | None = None                          # N örnek al (50k→birkaç yüz); None=hepsi
 
     # ---- model (ADR-6: önce SD1.5) ----
     base_model: str = "runwayml/stable-diffusion-v1-5"

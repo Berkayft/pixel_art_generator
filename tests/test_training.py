@@ -54,3 +54,34 @@ def test_load_examples_yerel_dataset(tmp_path):
     assert all(im.mode == "RGB" and im.size == (512, 512) for im in imgs)
     # caption ADR-7: trigger + içerik
     assert "pxforge, dungeon" in caps and "pxforge, town" in caps
+
+
+def test_build_from_zip_csv_lpc_tarzi(tmp_path):
+    """LPC-tarzı captioned csv+zip: subsample, basename eşleme, caption olduğu gibi."""
+    import csv as csvmod
+    import zipfile
+
+    from pixelforge.training.dataset import _build_from_zip_csv
+
+    # 3 görselli zip (root'ta char_*.png)
+    zip_path = tmp_path / "train.zip"
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        for i in range(3):
+            p = tmp_path / f"char_{i}.png"
+            arr = np.zeros((64, 64, 4), dtype=np.uint8)
+            arr[..., 3] = 255
+            Image.fromarray(arr, "RGBA").save(p)
+            zf.write(p, f"char_{i}.png")
+    # csv (image_path bir alt-yol içerse de basename ile eşleşmeli)
+    csv_path = tmp_path / "captions.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as fh:
+        w = csvmod.writer(fh)
+        w.writerow(["image_path", "text"])
+        for i in range(3):
+            w.writerow([f"images/char_{i}.png", f"lpc-style character number {i}"])
+
+    ex = _build_from_zip_csv(csv_path, zip_path, subsample=2, seed=1, resolution=512)
+    assert len(ex) == 2                                   # subsample uygulandı
+    imgs, caps = zip(*ex)
+    assert all(im.mode == "RGB" and im.size == (512, 512) for im in imgs)
+    assert all(c.startswith("lpc-style character") for c in caps)   # caption olduğu gibi

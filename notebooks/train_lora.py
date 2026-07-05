@@ -33,19 +33,33 @@
 # -------------------------------------------------------------
 from pixelforge.training import TrainingConfig, train_lora
 
+# --- LoRA #2: LPC 4-view (captioned sprite sheet) — ÖNERİLEN ---
+# Zengin caption + tutarlı stil + 'sheet'i tekte üret' + Faz 4 yönü.
 cfg = TrainingConfig(
-    dataset="BerkayFT/pixelforge-kenney-tiny-v1",   # HF Hub'daki dataset
-    trigger="pxforge",
-    rank=16,                 # ADR-6 baseline; öğrenmezse LoKr/DoRA'ya geç
+    dataset="carlosuperb/lpc-4view-pixel-art-diffusion",
+    caption_csv="captions/captions_optimized.csv",   # set → csv+zip yolu (manifest değil)
+    images_zip="images/train.zip",
+    subsample=800,           # 50k'dan 800 örnek (T4'te makul; seed ile reproducible)
+    rank=16,
     learning_rate=1e-4,
-    train_steps=1000,        # T4'te ilk deneme için makul
+    train_steps=1500,        # daha çeşitli veri → biraz daha uzun
     batch_size=1,
     grad_accum=4,
     seed=42,
-    sample_every=250,        # her 250 adımda örnek + eval metrikleri
-    # wandb_project="pixelforge",             # açarsan loss+örnek+metrik loglanır
-    # push_to_hub_repo="BerkayFT/pixelforge-lora-kenney-v1",   # açarsan Hub'a push
+    sample_every=300,
+    sample_prompts=[
+        "lpc-style pixel art character, female body, green skin, leather armor, "
+        "4-view sprite sheet (front/back/left/right), hard edges, no anti-aliasing",
+        "lpc-style pixel art character, male body, blue wizard robe, staff, "
+        "4-view sprite sheet (front/back/left/right), hard edges, no anti-aliasing",
+    ],
+    # wandb_project="pixelforge",
+    # push_to_hub_repo="BerkayFT/pixelforge-lora-lpc-v1",   # WRITE token ile
 )
+
+# --- LoRA #1: Kenney tiny (manifest yolu) — referans ---
+# cfg = TrainingConfig(dataset="BerkayFT/pixelforge-kenney-tiny-v1", trigger="pxforge",
+#                      train_steps=1000)
 
 out = train_lora(cfg)
 print("bitti →", out)
