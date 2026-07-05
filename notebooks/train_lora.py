@@ -7,7 +7,16 @@
 
 # %% CELL 1 - Kurulum (~2-3 dk)
 # -------------------------------------------------------------
-# !pip install -q "git+https://github.com/BerkayFT/pixel_art_generator.git#egg=pixelforge[ml,data]"
+# PEP 508 sözdizimi (egg fragment değil):
+#
+# Repo PUBLIC ise:
+# !pip install -q "pixelforge[ml,data] @ git+https://github.com/Berkayft/pixel_art_generator.git"
+#
+# Repo PRIVATE ise (Colab Secret'ta GH_TOKEN tanımla, sol menü 🔑):
+# from google.colab import userdata
+# tok = userdata.get("GH_TOKEN")
+# !pip install -q "pixelforge[ml,data] @ git+https://{tok}@github.com/Berkayft/pixel_art_generator.git"
+#
 # Kurulumdan sonra: Runtime > Restart session, sonra Cell 2'den devam.
 
 
