@@ -187,14 +187,19 @@ def _sample_and_eval(cfg, unet, vae, text_encoder, tokenizer, device, dtype, ste
     pipe.set_progress_bar_config(disable=True)
 
     logs, images = {}, []
-    for prompt in cfg.sample_prompts:
-        gen = torch.Generator(device).manual_seed(cfg.seed)
-        raw = pipe(prompt, num_inference_steps=25, guidance_scale=7.5, generator=gen).images[0]
-        asset, _ = pixelate(raw, target_res=cfg.resolution // 8, num_colors=32)
-        m = evaluate_asset(asset, target_colors=32)
-        for k, v in m.items():
-            logs.setdefault(k, []).append(v)
-        images.append((prompt, raw))
+    # unet fp32, vae/text_encoder fp16 → autocast dtype uyumsuzluğunu çözer
+    # (kanonik diffusers validation deseni). Ağırlıkları değiştirmez.
+    with torch.autocast(device, dtype=dtype, enabled=(device == "cuda")):
+        for prompt in cfg.sample_prompts:
+            gen = torch.Generator(device).manual_seed(cfg.seed)
+            raw = pipe(
+                prompt, num_inference_steps=25, guidance_scale=7.5, generator=gen
+            ).images[0]
+            asset, _ = pixelate(raw, target_res=cfg.resolution // 8, num_colors=32)
+            m = evaluate_asset(asset, target_colors=32)
+            for k, v in m.items():
+                logs.setdefault(k, []).append(v)
+            images.append((prompt, raw))
 
     # metrik ortalamaları (ADR-3: tek skora indirgeme, vektör tut)
     avg = {f"eval/{k}": sum(v) / len(v) for k, v in logs.items()}
