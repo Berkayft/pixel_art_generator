@@ -30,10 +30,13 @@ class IngestStats:
     kept: int = 0
 
 
-def _category_tag(png: Path, root: Path) -> str:
-    """İçerik tag'i = dosyanın bulunduğu alt-klasör (yoksa 'tile'). Kaba ama güvenilir."""
-    parent = png.parent.name.lower()
-    return parent if png.parent != root else "tile"
+def _category_tag(png: Path, root: Path, default_tag: str = "tile") -> str:
+    """İçerik tag'i (ADR-7): alt-klasör adı (ör. characters/backgrounds); kökteyse default_tag.
+
+    default_tag pack temasını taşır (dungeon/town) — dosya adları anlamsız (tile_0000) olduğu
+    ve pack'ler alt-klasörsüz olduğu için tek çeşitlilik kaynağı.
+    """
+    return png.parent.name.lower() if png.parent != root else default_tag
 
 
 def build_dataset(
@@ -44,33 +47,40 @@ def build_dataset(
     name: str,
     target_res: int = 512,
     source_label: str = "",
+    default_tags: list[str] | None = None,
     max_colors: int = 64,
     min_sharpness: float = 0.0,   # kapalı: edge_sharpness palet-rampasını yanlış eler
 ) -> tuple[DatasetManifest, IngestStats]:
-    """Kaynak dizinleri işleyip processed görselleri + manifest'i yazar."""
+    """Kaynak dizinleri işleyip processed görselleri + manifest'i yazar.
+
+    default_tags: her source_dir için kök-tile tag'i (ör. ["dungeon", "town"]). Verilmezse "tile".
+    """
     out_dir = Path(out_dir)
     (out_dir / "images").mkdir(parents=True, exist_ok=True)
+    if default_tags is not None and len(default_tags) != len(source_dirs):
+        raise ValueError("default_tags uzunluğu source_dirs ile eşleşmeli")
 
-    # 1) topla
-    entries: list[tuple[Path, Path, Image.Image]] = []  # (png, root, image)
-    for root in source_dirs:
+    # 1) topla — (png, root, default_tag, image)
+    entries: list[tuple[Path, Path, str, Image.Image]] = []
+    for i, root in enumerate(source_dirs):
         root = Path(root)
+        tag = default_tags[i] if default_tags else "tile"
         for png in sorted(root.rglob("*.png")):
             try:
-                entries.append((png, root, Image.open(png).copy()))
+                entries.append((png, root, tag, Image.open(png).copy()))
             except OSError:
                 continue
 
     stats = IngestStats(found=len(entries))
 
     # 2) dedup (içerik hash'i)
-    keep_idx = set(dedup([e[2] for e in entries]))
+    keep_idx = set(dedup([e[3] for e in entries]))
     stats.duplicates = len(entries) - len(keep_idx)
 
     # 3) QA + prepare + kaydet
     records: list[ImageRecord] = []
     native_sizes: dict[int, int] = {}
-    for i, (png, root, img) in enumerate(entries):
+    for i, (png, root, tag, img) in enumerate(entries):
         if i not in keep_idx:
             continue
         ok, _ = validate_pixel_asset(img, max_colors=max_colors, min_sharpness=min_sharpness)
@@ -82,7 +92,9 @@ def build_dataset(
         fname = f"{image_hash(img)[:12]}.png"
         tile.save(out_dir / "images" / fname)
         records.append(
-            ImageRecord(path=f"images/{fname}", content_tags=[_category_tag(png, root)])
+            ImageRecord(
+                path=f"images/{fname}", content_tags=[_category_tag(png, root, tag)]
+            )
         )
 
     stats.kept = len(records)
@@ -105,6 +117,10 @@ def main(argv: list[str] | None = None) -> None:
 
     p = argparse.ArgumentParser(description="Kenney pack → training dataset")
     p.add_argument("--src", nargs="+", required=True, help="kaynak dizin(ler)")
+    p.add_argument(
+        "--tags", nargs="*", default=None,
+        help="her --src için kök-tile tag'i (ör. dungeon town). Sırayla eşleşir.",
+    )
     p.add_argument("--out", required=True, help="çıktı dizini (data/processed/...)")
     p.add_argument("--trigger", default="pxforge")
     p.add_argument("--name", default="kenney-lora-v1")
@@ -127,6 +143,7 @@ def main(argv: list[str] | None = None) -> None:
         name=args.name,
         target_res=args.target_res,
         source_label=args.source_label,
+        default_tags=args.tags,
         max_colors=args.max_colors,
         min_sharpness=args.min_sharpness,
     )
