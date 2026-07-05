@@ -13,7 +13,6 @@ CLI:
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,7 +45,7 @@ def build_dataset(
     target_res: int = 512,
     source_label: str = "",
     max_colors: int = 64,
-    min_sharpness: float = 0.4,
+    min_sharpness: float = 0.0,   # kapalı: edge_sharpness palet-rampasını yanlış eler
 ) -> tuple[DatasetManifest, IngestStats]:
     """Kaynak dizinleri işleyip processed görselleri + manifest'i yazar."""
     out_dir = Path(out_dir)
@@ -111,6 +110,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--name", default="kenney-lora-v1")
     p.add_argument("--target-res", type=int, default=512)
     p.add_argument("--source-label", default="Kenney (CC0)")
+    p.add_argument("--max-colors", type=int, default=64, help="QA: üst renk sınırı")
+    p.add_argument(
+        "--min-sharpness",
+        type=float,
+        default=0.0,
+        help="QA: alt kenar-keskinliği. Güvenilir kaynakta 0 (kapalı) tut — "
+        "edge_sharpness palet-rampası gölgelemeyi yanlışlıkla eler.",
+    )
     args = p.parse_args(argv)
 
     manifest, stats = build_dataset(
@@ -120,6 +127,8 @@ def main(argv: list[str] | None = None) -> None:
         name=args.name,
         target_res=args.target_res,
         source_label=args.source_label,
+        max_colors=args.max_colors,
+        min_sharpness=args.min_sharpness,
     )
     print(
         f"bulundu={stats.found} tekrar={stats.duplicates} QA-elendi={stats.rejected_qa} "

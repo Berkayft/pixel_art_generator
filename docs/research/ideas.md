@@ -58,6 +58,25 @@ sağlanır; modeli bununla yormak yanlış.
 **Aksiyon:** Korelasyon matrisini yeni metrik ekledikçe yeniden üret; |r| yüksek çiftlerde
 birini ele. → RQ-E6.
 
+## H4 — edge_sharpness palet-rampası gölgelemeyi yanlış eler (empirik)
+
+**Gözlem:** Kenney Tiny (Dungeon+Town) 264 tile'a QA uygulandı → `edge_sharpness < 0.4`
+eşiği **112 tile'ı (%42) eledi**; median sharpness 0.43. Renkten eleme: 0.
+
+**Neden:** Gerçek pixel art, gölgelendirme için **komşu benzer palet renkleri** (ramp)
+kullanır — fark 8-64 aralığında. `edge_sharpness` bunları "yumuşak kenar" (anti-aliasing)
+sanıp cezalandırıyor. Ama bu kasıtlı stil, bulanıklık değil.
+
+**Sonuç:**
+1. **QA gate güvenilir kaynakta (Kenney CC0) sharpness kullanmamalı** → ingest varsayılanı
+   `min_sharpness=0.0`; sadece renk + dedup ile QA.
+2. **`edge_sharpness` metriği revizyona muhtaç:** "palet-rampası gölgeleme" ile "AA bulanıklığı"
+   ayırt edilmeli. Aday: farkı palet-uzayında ölç (asıl palete snap edilmiş mi?), ham RGB
+   gradyanında değil. → RQ-E3/E6 için somut iyileştirme.
+
+**Değer:** Bu, metriklerimizin gerçek veriyle ilk stres-testi — bir metriğin failure-mode'unu
+üretim akışında yakaladık (tam da eval harness'in amacı).
+
 ---
 
 _Not: korelasyon görseli git'e girmiyor (.gitignore *.png). Sayılar yukarıda transkript._
