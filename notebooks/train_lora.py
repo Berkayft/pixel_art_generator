@@ -65,11 +65,19 @@ out = train_lora(cfg)
 print("bitti →", out)
 
 
-# %% CELL 4 - Ürettiğini hızlı dene
+# %% CELL 4 - Ürettiğini hızlı dene (LPC 4-view)
 # -------------------------------------------------------------
-# from pixelforge.pipeline import PixelArtPipeline, GenerationRequest
 # import torch
 # from diffusers import StableDiffusionPipeline
-# pipe = StableDiffusionPipeline.from_pretrained(cfg.base_model, torch_dtype=torch.float16).to("cuda")
+# pipe = StableDiffusionPipeline.from_pretrained(
+#     cfg.base_model, torch_dtype=torch.float16, safety_checker=None).to("cuda")
 # pipe.load_lora_weights(out)
-# pipe("pxforge, dungeon, a treasure chest", num_inference_steps=25, guidance_scale=7.5).images[0]
+# # prompt'u caption stiline uydur:
+# img = pipe(
+#     "lpc-style pixel art character, female body, green skin, leather armor, "
+#     "4-view sprite sheet (front/back/left/right), hard edges, no anti-aliasing",
+#     num_inference_steps=25, guidance_scale=7.5).images[0]
+# # gerçek asset için pixelate'ten geçir:
+# from pixelforge.postprocess import pixelate
+# _, preview = pixelate(img, target_res=128, num_colors=32)
+# preview
